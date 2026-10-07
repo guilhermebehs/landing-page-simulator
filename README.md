@@ -66,12 +66,16 @@ expect(screen.getByRole('button')).toHaveTextContent('Count is 1') // Assert: co
 ├── index.html            # Página HTML base. Tem um <div id="root"> onde o React é montado
 ├── src/
 │   ├── main.tsx          # Ponto de entrada: pega o #root e renderiza o <App />
-│   ├── App.tsx           # Componente principal (hoje é a página de exemplo do Vite)
-│   ├── App.test.tsx      # Testes do App
-│   ├── test/setup.ts     # Roda antes dos testes: carrega os matchers do jest-dom e limpa o DOM
-│   ├── App.css           # Estilos da página de exemplo (vai sumir quando a gente trocar a página)
-│   ├── index.css         # CSS global. A 1ª linha `@import "tailwindcss";` liga o Tailwind
-│   └── assets/           # Imagens importadas pelo código (passam pelo build do Vite)
+│   ├── App.tsx           # Componente principal: guarda o estado (config) e monta o layout
+│   ├── App.test.tsx      # Testes de integração do App
+│   ├── types.ts          # Tipos TypeScript da configuração da landing page
+│   ├── defaultConfig.ts  # Valores iniciais do formulário e lista de fontes
+│   ├── index.css         # CSS global. Só tem `@import "tailwindcss";`, que liga o Tailwind
+│   ├── components/
+│   │   ├── LandingPageForm.tsx       # Formulário com as seções Header, Body e Footer
+│   │   ├── LandingPageForm.test.tsx  # Testes do formulário
+│   │   └── fields.tsx                # Campos reutilizáveis (texto, cor, select, fundo…)
+│   └── test/setup.ts     # Roda antes dos testes: carrega os matchers do jest-dom e limpa o DOM
 ├── public/               # Arquivos servidos como estão, na raiz do site (ex.: /favicon.svg)
 ├── vite.config.ts        # Config do Vite (plugins do React e do Tailwind) e do Vitest (bloco `test`)
 ├── tsconfig*.json        # Config do TypeScript (app = código do navegador, node = vite.config)
@@ -86,6 +90,19 @@ expect(screen.getByRole('button')).toHaveTextContent('Count is 1') // Assert: co
 2. O `index.html` carrega `src/main.tsx`.
 3. `main.tsx` importa o CSS global (com o Tailwind) e renderiza `<App />` dentro de `#root`.
 4. Tudo que aparece na tela vem de `App.tsx` e dos componentes que ele usar.
+
+### Fluxo dos dados
+
+```
+App  ── config ──▶  LandingPageForm  ── value ──▶  campos (TextField, ColorField…)
+ ▲                        │                               │
+ └──── setConfig ◀── onChange(config novo) ◀── onChange(valor novo)
+```
+
+O estado (`config`) mora no `App`. O formulário e os campos são *controlados*: só mostram o
+valor que recebem por props e avisam mudanças via `onChange`. O `App` atualiza o estado e o
+React re-renderiza tudo com o valor novo. Quando a preview e o download existirem, eles vão
+ler esse mesmo `config`.
 
 ## Deploy
 

@@ -1,27 +1,29 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import App from './App'
 
 describe('App', () => {
-  it('renders the page heading', () => {
+  it('renders the form sections', () => {
     render(<App />)
 
-    expect(
-      screen.getByRole('heading', { name: 'Get started' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Landing Page Simulator' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Header' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Body' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Footer' })).toBeInTheDocument()
   })
 
-  it('increments the counter when the button is clicked', async () => {
+  // Teste de integração: confere que o App guarda o estado e devolve o valor novo ao formulário
+  it('keeps what the user types in the form', async () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const button = screen.getByRole('button', { name: /count is/i })
-    expect(button).toHaveTextContent('Count is 0')
+    const header = within(screen.getByRole('group', { name: 'Header' }))
+    const title = header.getByLabelText('Título')
 
-    await user.click(button)
-    await user.click(button)
+    await user.clear(title)
+    await user.type(title, 'Padaria do João')
 
-    expect(button).toHaveTextContent('Count is 2')
+    expect(title).toHaveValue('Padaria do João')
   })
 })
