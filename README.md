@@ -70,10 +70,13 @@ expect(screen.getByRole('button')).toHaveTextContent('Count is 1') // Assert: co
 │   ├── App.test.tsx      # Testes de integração do App
 │   ├── types.ts          # Tipos TypeScript da configuração da landing page
 │   ├── defaultConfig.ts  # Valores iniciais do formulário e lista de fontes
+│   ├── generateHtml.ts   # Gera o HTML + CSS puro da landing page a partir do config
+│   ├── generateHtml.test.ts
 │   ├── index.css         # CSS global. Só tem `@import "tailwindcss";`, que liga o Tailwind
 │   ├── components/
 │   │   ├── LandingPageForm.tsx       # Formulário com as seções Header, Body e Footer
 │   │   ├── LandingPageForm.test.tsx  # Testes do formulário
+│   │   ├── Preview.tsx               # Mostra o HTML gerado dentro de um <iframe>
 │   │   └── fields.tsx                # Campos reutilizáveis (texto, cor, select, fundo…)
 │   └── test/setup.ts     # Roda antes dos testes: carrega os matchers do jest-dom e limpa o DOM
 ├── public/               # Arquivos servidos como estão, na raiz do site (ex.: /favicon.svg)
@@ -95,14 +98,25 @@ expect(screen.getByRole('button')).toHaveTextContent('Count is 1') // Assert: co
 
 ```
 App  ── config ──▶  LandingPageForm  ── value ──▶  campos (TextField, ColorField…)
- ▲                        │                               │
- └──── setConfig ◀── onChange(config novo) ◀── onChange(valor novo)
+ │▲                       │                               │
+ │└──── setConfig ◀── onChange(config novo) ◀── onChange(valor novo)
+ │
+ └─── config ──▶  Preview  ── generateHtml(config) ──▶  <iframe srcDoc={html}>
 ```
 
 O estado (`config`) mora no `App`. O formulário e os campos são *controlados*: só mostram o
 valor que recebem por props e avisam mudanças via `onChange`. O `App` atualiza o estado e o
-React re-renderiza tudo com o valor novo. Quando a preview e o download existirem, eles vão
-ler esse mesmo `config`.
+React re-renderiza tudo com o valor novo, inclusive a preview.
+
+### Preview = arquivo baixado
+
+`generateHtml(config)` monta a landing page como um texto HTML com CSS puro embutido. A preview
+mostra esse texto num `<iframe>`, e o download vai salvar o mesmo texto num arquivo, então o
+que o cliente vê é exatamente o que ele baixa. O iframe é um documento isolado: o Tailwind do
+app não interfere na landing page e vice-versa.
+
+Como o texto do cliente vai parar dentro do HTML, ele é *escapado* (`<` vira `&lt;` etc.),
+cores e fontes são validadas, e o iframe roda com `sandbox` (sem scripts).
 
 ## Deploy
 
