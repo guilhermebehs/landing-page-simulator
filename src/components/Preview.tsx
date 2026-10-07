@@ -1,12 +1,7 @@
-import { generateHtml } from '../generateHtml'
-import type { LandingPageConfig } from '../types'
-
 // Mostra a landing page dentro de um <iframe>, como se fosse uma janela de navegador.
 // O iframe é um documento separado: o CSS do nosso app (Tailwind) não vaza pra dentro dele
 // e o CSS da landing page não vaza pra fora. Assim a preview fica igual ao arquivo baixado.
-export function Preview({ config }: { config: LandingPageConfig }) {
-  const html = generateHtml(config)
-
+export function Preview({ html }: { html: string }) {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg">
       {/* Barra decorativa imitando uma janela de navegador */}

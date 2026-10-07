@@ -100,7 +100,7 @@ export function SelectField({
 }
 
 // Campo opcional: um input vazio vira `undefined`, ou seja, "sem imagem".
-export function ImageUrlField({
+function ImageUrlField({
   value,
   onChange,
 }: {

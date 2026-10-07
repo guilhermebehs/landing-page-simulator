@@ -13,7 +13,7 @@ export type HeaderConfig = {
   text: string
   textColor: string
   font: string
-  backgroundImage?: string
+  background: Background
 }
 
 export type BodyConfig = {

@@ -20,6 +20,7 @@ export const defaultConfig: LandingPageConfig = {
     text: 'O melhor serviço da cidade',
     textColor: '#1f2937',
     font: FONT_OPTIONS[1].value,
+    background: { color: '#f3f4f6' },
   },
   body: {
     title: 'Sobre nós',

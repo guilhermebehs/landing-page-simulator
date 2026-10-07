@@ -1,7 +1,10 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import App from './App'
+import * as download from './download'
+import { generateHtml } from './generateHtml'
+import { defaultConfig } from './defaultConfig'
 
 describe('App', () => {
   it('renders the form sections', () => {
@@ -11,6 +14,12 @@ describe('App', () => {
     expect(screen.getByRole('group', { name: 'Header' })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Body' })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Footer' })).toBeInTheDocument()
+  })
+
+  it('describes what the app does', () => {
+    render(<App />)
+
+    expect(screen.getByText(/monte uma landing page/i)).toBeInTheDocument()
   })
 
   it('renders the preview', () => {
@@ -46,5 +55,20 @@ describe('App', () => {
 
     const preview = screen.getByTitle('Preview da landing page')
     expect(preview.getAttribute('srcdoc')).toContain('<h2>Nosso cardápio</h2>')
+  })
+
+  it('downloads the same HTML shown in the preview, named after the header title', async () => {
+    const user = userEvent.setup()
+    // Espiamos a função de download para não disparar um download de verdade no teste
+    const downloadHtml = vi.spyOn(download, 'downloadHtml').mockImplementation(() => {})
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: 'Baixar HTML' }))
+
+    const preview = screen.getByTitle('Preview da landing page')
+    expect(downloadHtml).toHaveBeenCalledWith(generateHtml(defaultConfig), 'minha-empresa.html')
+    expect(preview.getAttribute('srcdoc')).toBe(generateHtml(defaultConfig))
+
+    downloadHtml.mockRestore()
   })
 })

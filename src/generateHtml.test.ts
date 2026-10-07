@@ -69,11 +69,16 @@ describe('generateHtml', () => {
     expect(html).toContain('background: url("https://example.com/bg.jpg") center / cover no-repeat, #1f2937;')
   })
 
-  it('uses a header background image only when provided', () => {
-    expect(generateHtml(defaultConfig)).not.toContain('url(')
+  it('applies the header background color and optional image', () => {
+    const colorOnly = parse(withConfig({ header: { background: { color: '#abcdef' } } }))
+    expect(colorOnly.querySelector('style')?.textContent).toMatch(/header \{[^}]*background: #abcdef;/)
 
-    const html = generateHtml(withConfig({ header: { backgroundImage: 'https://example.com/top.jpg' } }))
-    expect(html).toContain('url("https://example.com/top.jpg")')
+    const withImage = parse(
+      withConfig({ header: { background: { color: '#abcdef', image: 'https://example.com/top.jpg' } } }),
+    )
+    expect(withImage.querySelector('style')?.textContent).toMatch(
+      /header \{[^}]*background: url\("https:\/\/example.com\/top.jpg"\) center \/ cover no-repeat, #abcdef;/,
+    )
   })
 
   it('picks a readable text color for the background', () => {
@@ -86,7 +91,9 @@ describe('generateHtml', () => {
 
   it('cannot break out of the CSS through an image URL', () => {
     const html = generateHtml(
-      withConfig({ header: { backgroundImage: 'x"); } </style><script>alert(1)</script>' } }),
+      withConfig({
+        header: { background: { color: '#ffffff', image: 'x"); } </style><script>alert(1)</script>' } },
+      }),
     )
 
     expect(html).not.toContain('<script>')

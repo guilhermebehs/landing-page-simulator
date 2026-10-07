@@ -28,7 +28,7 @@ export function generateHtml(config: LandingPageConfig): string {
       text-align: center;
       color: ${safeColor(header.textColor, '#1f2937')};
       font-family: ${safeFont(header.font)};
-      ${header.backgroundImage ? `background: ${imageLayer(header.backgroundImage)};` : ''}
+      background: ${backgroundCss(header.background)};
     }
     header h1 { margin: 0 0 16px; font-size: 48px; line-height: 1.1; }
     header p { margin: 0; font-size: 20px; white-space: pre-line; }

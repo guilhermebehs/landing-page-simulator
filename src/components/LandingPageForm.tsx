@@ -3,7 +3,6 @@ import type { BodyConfig, FooterConfig, HeaderConfig, LandingPageConfig } from '
 import {
   BackgroundField,
   ColorField,
-  ImageUrlField,
   Section,
   SelectField,
   TextAreaField,
@@ -56,9 +55,9 @@ export function LandingPageForm({ config, onChange }: LandingPageFormProps) {
           options={FONT_OPTIONS}
           onChange={(font) => updateHeader({ font })}
         />
-        <ImageUrlField
-          value={config.header.backgroundImage}
-          onChange={(backgroundImage) => updateHeader({ backgroundImage })}
+        <BackgroundField
+          value={config.header.background}
+          onChange={(background) => updateHeader({ background })}
         />
       </Section>
 

@@ -66,12 +66,14 @@ expect(screen.getByRole('button')).toHaveTextContent('Count is 1') // Assert: co
 ├── index.html            # Página HTML base. Tem um <div id="root"> onde o React é montado
 ├── src/
 │   ├── main.tsx          # Ponto de entrada: pega o #root e renderiza o <App />
-│   ├── App.tsx           # Componente principal: guarda o estado (config) e monta o layout
+│   ├── App.tsx           # Componente principal: guarda o estado (config), gera o HTML e monta o layout
 │   ├── App.test.tsx      # Testes de integração do App
 │   ├── types.ts          # Tipos TypeScript da configuração da landing page
 │   ├── defaultConfig.ts  # Valores iniciais do formulário e lista de fontes
 │   ├── generateHtml.ts   # Gera o HTML + CSS puro da landing page a partir do config
 │   ├── generateHtml.test.ts
+│   ├── download.ts       # Baixa o HTML como arquivo (Blob + <a download>) e gera o nome do arquivo
+│   ├── download.test.ts
 │   ├── index.css         # CSS global. Só tem `@import "tailwindcss";`, que liga o Tailwind
 │   ├── components/
 │   │   ├── LandingPageForm.tsx       # Formulário com as seções Header, Body e Footer
@@ -101,7 +103,8 @@ App  ── config ──▶  LandingPageForm  ── value ──▶  campos (T
  │▲                       │                               │
  │└──── setConfig ◀── onChange(config novo) ◀── onChange(valor novo)
  │
- └─── config ──▶  Preview  ── generateHtml(config) ──▶  <iframe srcDoc={html}>
+ └─── html = generateHtml(config) ──┬──▶  Preview  ──▶  <iframe srcDoc={html}>
+                                   └──▶  botão "Baixar HTML"  ──▶  downloadHtml(html, "titulo.html")
 ```
 
 O estado (`config`) mora no `App`. O formulário e os campos são *controlados*: só mostram o
@@ -111,9 +114,12 @@ React re-renderiza tudo com o valor novo, inclusive a preview.
 ### Preview = arquivo baixado
 
 `generateHtml(config)` monta a landing page como um texto HTML com CSS puro embutido. A preview
-mostra esse texto num `<iframe>`, e o download vai salvar o mesmo texto num arquivo, então o
+mostra esse texto num `<iframe>`, e o botão "Baixar HTML" salva o mesmo texto num arquivo, então o
 que o cliente vê é exatamente o que ele baixa. O iframe é um documento isolado: o Tailwind do
 app não interfere na landing page e vice-versa.
+
+O download acontece todo no navegador, sem servidor: o texto vira um `Blob` (arquivo em memória),
+ganha uma URL temporária (`blob:...`) e um link `<a download="nome.html">` invisível é clicado.
 
 Como o texto do cliente vai parar dentro do HTML, ele é *escapado* (`<` vira `&lt;` etc.),
 cores e fontes são validadas, e o iframe roda com `sandbox` (sem scripts).

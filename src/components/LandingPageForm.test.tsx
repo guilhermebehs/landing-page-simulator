@@ -102,18 +102,37 @@ describe('LandingPageForm', () => {
     })
   })
 
+  it('updates the header background color', () => {
+    const { onChange } = renderForm()
+
+    fireEvent.change(getSection('Header').getByLabelText('Cor de fundo'), {
+      target: { value: '#123456' },
+    })
+
+    expect(onChange).toHaveBeenCalledWith({
+      ...defaultConfig,
+      header: { ...defaultConfig.header, background: { color: '#123456' } },
+    })
+  })
+
   it('removes the header image when the field is cleared', async () => {
     const user = userEvent.setup()
     const { onChange } = renderForm({
       ...defaultConfig,
-      header: { ...defaultConfig.header, backgroundImage: 'https://example.com/bg.jpg' },
+      header: {
+        ...defaultConfig.header,
+        background: { ...defaultConfig.header.background, image: 'https://example.com/bg.jpg' },
+      },
     })
 
     await user.clear(getSection('Header').getByLabelText('URL da imagem de fundo (opcional)'))
 
     expect(onChange).toHaveBeenCalledWith({
       ...defaultConfig,
-      header: { ...defaultConfig.header, backgroundImage: undefined },
+      header: {
+        ...defaultConfig.header,
+        background: { ...defaultConfig.header.background, image: undefined },
+      },
     })
   })
 })
