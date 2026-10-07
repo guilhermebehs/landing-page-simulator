@@ -17,9 +17,11 @@ Outros scripts:
 
 | Comando           | O que faz                                                         |
 | ----------------- | ----------------------------------------------------------------- |
-| `npm run build`   | Checa os tipos (`tsc -b`) e gera a versão de produção em `dist/`   |
+| `npm run build`   | Roda os testes, checa os tipos (`tsc -b`) e gera a versão de produção em `dist/`. Se um teste falhar, o build (e o deploy na Vercel) para |
 | `npm run preview` | Serve o conteúdo de `dist/` localmente, igual ao que vai pra Vercel |
 | `npm run lint`    | Roda o linter (oxlint) procurando problemas no código              |
+| `npm test`        | Roda os testes em modo *watch* (re-executa ao salvar um arquivo)   |
+| `npm run test:run`| Roda os testes uma vez e sai (bom para CI)                         |
 
 ## O papel de cada tecnologia
 
@@ -35,6 +37,29 @@ Outros scripts:
   (`className="rounded-full bg-emerald-500 px-3"`), em vez de escrever arquivos `.css` separados.
   Só as classes usadas entram no CSS final.
 
+## Testes
+
+- **Vitest** — o test runner. Feito para Vite, então reaproveita a mesma config
+  (plugins, TypeScript, JSX) sem setup extra. API parecida com a do Jest
+  (`describe`, `it`, `expect`).
+- **jsdom** — simula um navegador (DOM) dentro do Node, para os componentes terem onde renderizar.
+- **React Testing Library** — renderiza componentes e busca elementos *como um usuário faria*
+  (pelo texto, pelo papel — `button`, `heading` — ou pelo label), em vez de por classes CSS.
+  Assim os testes não quebram quando você só muda o visual.
+- **user-event** — simula interações reais (clicar, digitar) disparando os mesmos eventos do navegador.
+- **jest-dom** — adiciona matchers legíveis como `toBeInTheDocument()` e `toHaveTextContent()`.
+
+Convenção: o teste fica ao lado do componente, com o sufixo `.test.tsx`
+(ex.: `App.tsx` → `App.test.tsx`). O Vitest encontra esses arquivos sozinho.
+
+Um teste segue o padrão **Arrange → Act → Assert**:
+
+```tsx
+render(<App />)                                     // Arrange: monta o componente
+await user.click(screen.getByRole('button'))        // Act: interage como usuário
+expect(screen.getByRole('button')).toHaveTextContent('Count is 1') // Assert: confere o resultado
+```
+
 ## Estrutura de arquivos
 
 ```
@@ -42,11 +67,13 @@ Outros scripts:
 ├── src/
 │   ├── main.tsx          # Ponto de entrada: pega o #root e renderiza o <App />
 │   ├── App.tsx           # Componente principal (hoje é a página de exemplo do Vite)
+│   ├── App.test.tsx      # Testes do App
+│   ├── test/setup.ts     # Roda antes dos testes: carrega os matchers do jest-dom e limpa o DOM
 │   ├── App.css           # Estilos da página de exemplo (vai sumir quando a gente trocar a página)
 │   ├── index.css         # CSS global. A 1ª linha `@import "tailwindcss";` liga o Tailwind
 │   └── assets/           # Imagens importadas pelo código (passam pelo build do Vite)
 ├── public/               # Arquivos servidos como estão, na raiz do site (ex.: /favicon.svg)
-├── vite.config.ts        # Config do Vite: plugins do React e do Tailwind
+├── vite.config.ts        # Config do Vite (plugins do React e do Tailwind) e do Vitest (bloco `test`)
 ├── tsconfig*.json        # Config do TypeScript (app = código do navegador, node = vite.config)
 ├── .oxlintrc.json        # Config do linter
 ├── .nvmrc                # Versão do Node do projeto (lida pelo `nvm use`)
