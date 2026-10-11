@@ -39,6 +39,35 @@ describe('LandingPageForm', () => {
     })
   })
 
+  it('updates the optional header logo URL', () => {
+    const { onChange } = renderForm()
+
+    fireEvent.change(getSection('Header').getByLabelText('URL do logo (opcional)'), {
+      target: { value: 'https://example.com/logo.png' },
+    })
+
+    expect(onChange).toHaveBeenCalledWith({
+      ...defaultConfig,
+      header: { ...defaultConfig.header, logoUrl: 'https://example.com/logo.png' },
+    })
+  })
+
+  it('updates a social URL while keeping the other social fields', () => {
+    const { onChange } = renderForm()
+
+    fireEvent.change(getSection('Footer').getByLabelText('Instagram (URL opcional)'), {
+      target: { value: 'https://instagram.com/minhaempresa' },
+    })
+
+    expect(onChange).toHaveBeenCalledWith({
+      ...defaultConfig,
+      footer: {
+        ...defaultConfig.footer,
+        socialLinks: { ...defaultConfig.footer.socialLinks, instagram: 'https://instagram.com/minhaempresa' },
+      },
+    })
+  })
+
   it('updates the header text color', () => {
     const { onChange } = renderForm()
 

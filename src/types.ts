@@ -13,6 +13,7 @@ export type HeaderConfig = {
   text: string
   textColor: string
   font: string
+  logoUrl: string
   background: Background
 }
 
@@ -25,6 +26,14 @@ export type BodyConfig = {
 export type FooterConfig = {
   text: string
   background: Background
+  socialLinks: SocialLinks
+}
+
+export type SocialLinks = {
+  instagram: string
+  facebook: string
+  linkedin: string
+  whatsapp: string
 }
 
 export type LandingPageConfig = {

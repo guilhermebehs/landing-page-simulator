@@ -6,6 +6,24 @@ import type { Background, LandingPageConfig } from './types'
 // A preview mostra esse HTML num <iframe> e o download salva esse mesmo texto num arquivo.
 export function generateHtml(config: LandingPageConfig): string {
   const { header, body, footer } = config
+  const logoUrl = safeWebUrl(header.logoUrl)
+  const socialLinks = [
+    ['Instagram', footer.socialLinks.instagram],
+    ['Facebook', footer.socialLinks.facebook],
+    ['LinkedIn', footer.socialLinks.linkedin],
+    ['WhatsApp', footer.socialLinks.whatsapp],
+  ]
+    .map(([label, url]) => {
+      const safeUrl = safeWebUrl(url)
+      return safeUrl
+        ? `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">${label}</a>`
+        : ''
+    })
+    .filter(Boolean)
+    .join('\n        ')
+  const footerContent = socialLinks
+    ? `${escapeHtml(footer.text)}<nav class="social-links" aria-label="Redes sociais">${socialLinks}</nav>`
+    : escapeHtml(footer.text)
 
   return `<!doctype html>
 <html lang="pt-BR">
@@ -32,6 +50,7 @@ export function generateHtml(config: LandingPageConfig): string {
     }
     header h1 { margin: 0 0 16px; font-size: 48px; line-height: 1.1; }
     header p { margin: 0; font-size: 20px; white-space: pre-line; }
+    header .logo { display: block; max-width: 180px; max-height: 72px; object-fit: contain; margin: 0 auto 24px; }
     main {
       flex: 1;
       padding: 64px 24px;
@@ -48,11 +67,14 @@ export function generateHtml(config: LandingPageConfig): string {
       color: ${contrastTextColor(footer.background.color)};
     }
     footer .container { white-space: pre-line; }
+    footer .social-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    footer .social-links a { color: inherit; text-decoration: none; border: 1px solid currentColor; border-radius: 999px; padding: 6px 12px; }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
+      ${logoUrl ? `<img class="logo" src="${escapeHtml(logoUrl)}" alt="${escapeHtml(header.title ? `Logo de ${header.title}` : 'Logo da empresa')}">` : ''}
       ${header.title ? `<h1>${escapeHtml(header.title)}</h1>` : ''}
       ${header.text ? `<p>${escapeHtml(header.text)}</p>` : ''}
     </div>
@@ -64,7 +86,7 @@ export function generateHtml(config: LandingPageConfig): string {
     </div>
   </main>
   <footer>
-    <div class="container">${escapeHtml(footer.text)}</div>
+    <div class="container">${footerContent}</div>
   </footer>
 </body>
 </html>
@@ -119,6 +141,16 @@ function escapeCssString(text: string): string {
 // Só aceita cores no formato #rrggbb (o que o <input type="color"> produz)
 function safeColor(color: string, fallback: string): string {
   return /^#[0-9a-f]{6}$/i.test(color) ? color : fallback
+}
+
+// URLs externas da logo e redes sociais aceitam apenas HTTP e HTTPS.
+function safeWebUrl(value: string): string | undefined {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : undefined
+  } catch {
+    return undefined
+  }
 }
 
 // Só aceita fontes da nossa lista

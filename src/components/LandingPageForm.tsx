@@ -39,6 +39,13 @@ export function LandingPageForm({ config, onChange }: LandingPageFormProps) {
           value={config.header.title}
           onChange={(title) => updateHeader({ title })}
         />
+        <TextField
+          label="URL do logo (opcional)"
+          type="url"
+          placeholder="https://..."
+          value={config.header.logoUrl}
+          onChange={(logoUrl) => updateHeader({ logoUrl })}
+        />
         <TextAreaField
           label="Texto"
           value={config.header.text}
@@ -83,6 +90,42 @@ export function LandingPageForm({ config, onChange }: LandingPageFormProps) {
           label="Texto"
           value={config.footer.text}
           onChange={(text) => updateFooter({ text })}
+        />
+        <TextField
+          label="Instagram (URL opcional)"
+          type="url"
+          placeholder="https://instagram.com/..."
+          value={config.footer.socialLinks.instagram}
+          onChange={(instagram) =>
+            updateFooter({ socialLinks: { ...config.footer.socialLinks, instagram } })
+          }
+        />
+        <TextField
+          label="Facebook (URL opcional)"
+          type="url"
+          placeholder="https://facebook.com/..."
+          value={config.footer.socialLinks.facebook}
+          onChange={(facebook) =>
+            updateFooter({ socialLinks: { ...config.footer.socialLinks, facebook } })
+          }
+        />
+        <TextField
+          label="LinkedIn (URL opcional)"
+          type="url"
+          placeholder="https://linkedin.com/..."
+          value={config.footer.socialLinks.linkedin}
+          onChange={(linkedin) =>
+            updateFooter({ socialLinks: { ...config.footer.socialLinks, linkedin } })
+          }
+        />
+        <TextField
+          label="WhatsApp (URL opcional)"
+          type="url"
+          placeholder="https://wa.me/..."
+          value={config.footer.socialLinks.whatsapp}
+          onChange={(whatsapp) =>
+            updateFooter({ socialLinks: { ...config.footer.socialLinks, whatsapp } })
+          }
         />
         <BackgroundField
           value={config.footer.background}

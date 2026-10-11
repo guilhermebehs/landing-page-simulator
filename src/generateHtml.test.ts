@@ -47,6 +47,55 @@ describe('generateHtml', () => {
     expect(doc.querySelector('main h2')).toBeNull()
   })
 
+  it('renders an optional logo with useful alternative text', () => {
+    const doc = parse(withConfig({ header: { logoUrl: 'https://example.com/logo.png' } }))
+    const logo = doc.querySelector('header img.logo')
+
+    expect(logo?.getAttribute('src')).toBe('https://example.com/logo.png')
+    expect(logo?.getAttribute('alt')).toBe(`Logo de ${defaultConfig.header.title}`)
+  })
+
+  it('renders only configured social links in the footer', () => {
+    const doc = parse(
+      withConfig({
+        footer: {
+          socialLinks: {
+            instagram: 'https://instagram.com/minhaempresa',
+            facebook: '',
+            linkedin: 'https://linkedin.com/company/minhaempresa',
+            whatsapp: '',
+          },
+        },
+      }),
+    )
+    const links = [...doc.querySelectorAll('footer nav a')]
+
+    expect(links.map((link) => [link.textContent, link.getAttribute('href')])).toEqual([
+      ['Instagram', 'https://instagram.com/minhaempresa'],
+      ['LinkedIn', 'https://linkedin.com/company/minhaempresa'],
+    ])
+    expect(doc.querySelector('footer nav')?.getAttribute('aria-label')).toBe('Redes sociais')
+  })
+
+  it('ignores non-HTTP URLs for the logo and social links', () => {
+    const doc = parse(
+      withConfig({
+        header: { logoUrl: 'javascript:alert(1)' },
+        footer: {
+          socialLinks: {
+            instagram: 'javascript:alert(1)',
+            facebook: 'data:text/html,unsafe',
+            linkedin: '',
+            whatsapp: '',
+          },
+        },
+      }),
+    )
+
+    expect(doc.querySelector('header img.logo')).toBeNull()
+    expect(doc.querySelector('footer nav')).toBeNull()
+  })
+
   it('applies the header color and font', () => {
     const html = generateHtml(withConfig({ header: { textColor: '#ff0000', font: 'Georgia, serif' } }))
 
