@@ -5,9 +5,8 @@ import type { Background } from '../types'
 // recebem o `value` atual por props e avisam a mudança via `onChange`,
 // sem guardar estado próprio. Quem guarda o estado é o App.
 
-const labelClass = 'block text-sm font-medium text-gray-700'
-const inputClass =
-  'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+const labelClass = 'field-label'
+const inputClass = 'field-input'
 
 type FieldProps = {
   label: string
@@ -16,11 +15,16 @@ type FieldProps = {
 }
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
+  const sectionNumber = title === 'Header' ? '01' : title === 'Body' ? '02' : '03'
+  const sectionIcon = title === 'Header' ? '✦' : title === 'Body' ? '▦' : '♡'
+
   return (
-    <fieldset className="space-y-4 rounded-lg border border-gray-200 p-4">
-      <legend className="px-1 text-sm font-semibold uppercase tracking-wide text-gray-500">
-        {title}
-      </legend>
+    <fieldset className="form-section space-y-4 rounded-lg border p-4">
+      <legend className="sr-only">{title}</legend>
+      <div className="section-heading" aria-hidden="true">
+        <span className="section-title"><span className="section-icon">{sectionIcon}</span>{title}</span>
+        <span className={`section-number section-number-${sectionNumber}`}>{sectionNumber}</span>
+      </div>
       {children}
     </fieldset>
   )
@@ -69,7 +73,7 @@ export function ColorField({ label, value, onChange }: FieldProps) {
         type="color"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-8 w-14 cursor-pointer rounded border border-gray-300"
+        className="color-input h-8 w-14 cursor-pointer rounded"
       />
     </label>
   )
@@ -127,7 +131,7 @@ export function BackgroundField({
   onChange: (value: Background) => void
 }) {
   return (
-    <fieldset className="space-y-3">
+    <fieldset className="background-fields space-y-3">
       <legend className={labelClass}>Fundo</legend>
       <ColorField
         label="Cor de fundo"
