@@ -24,16 +24,29 @@ button, input, textarea, select { font: inherit; }
 .eyebrow { color: #887f9d; font-size: 10px; font-weight: 800; letter-spacing: 1.3px; text-transform: uppercase; }
 .editor-intro p { color: #777386; line-height: 1.55; }
 
-.form-section {
-  min-width: 0; border: 1px solid #eee8df; border-radius: 15px; background: #fff;
-  padding: 13px 14px 14px; box-shadow: 0 4px 12px #33275609;
+/* Abas fixas no topo enquanto os campos rolam por baixo */
+.tab-list {
+  position: sticky; top: 0; z-index: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+  margin: 0 -4px 12px; border-radius: 13px; background: #f3eee7; padding: 4px;
+  box-shadow: 0 0 0 4px #fffdf9;
 }
-.section-heading { display: flex; align-items: center; justify-content: space-between; width: 100%; margin: 0 0 2px; }
-.section-title { color: #302c4e; font-size: 12px; font-weight: 850; letter-spacing: .3px; }
-.section-icon { display: inline-block; margin-right: 7px; color: #633be8; }
-.section-number { padding: 4px 8px; border-radius: 99px; background: #f0eaff; color: #603ce0; font-size: 9px; font-weight: 800; }
-.section-number-02 { background: #fff0e9; color: #d7654d; }
-.section-number-03 { background: #e9f7f2; color: #34866c; }
+.tab {
+  display: flex; align-items: center; justify-content: center; min-height: 34px;
+  border: 0; border-radius: 10px; background: transparent; padding: 6px 4px;
+  color: #777386; font-size: 11px; font-weight: 750; cursor: pointer;
+  transition: background-color .15s, color .15s, box-shadow .15s;
+}
+.tab:hover { color: #302c4e; }
+.tab[aria-selected="true"] { background: #fff; color: #302c4e; box-shadow: 0 2px 6px #33275614; }
+.tab:focus-visible { outline: 2px solid #633be8; outline-offset: 1px; }
+/* No desktop a barra lateral rola sozinha e tem 24px de padding: subimos as abas até a borda */
+@media (min-width: 768px) {
+  .tab-list { top: -24px; }
+}
+.tab-panel {
+  min-width: 0; border: 1px solid #eee8df; border-radius: 15px; background: #fff;
+  padding: 14px; box-shadow: 0 4px 12px #33275609;
+}
 .field-label { display: block; color: #625d74; font-size: 10px; font-weight: 700; }
 .field-input {
   display: block; width: 100%; margin-top: 5px; border: 1px solid #e5e0e9; border-radius: 8px;

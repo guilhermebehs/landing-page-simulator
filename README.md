@@ -76,8 +76,10 @@ expect(screen.getByRole('button')).toHaveTextContent('Count is 1') // Assert: co
 │   ├── download.test.ts
 │   ├── index.css         # CSS global. Só tem `@import "tailwindcss";`, que liga o Tailwind
 │   ├── components/
-│   │   ├── LandingPageForm.tsx       # Formulário com as seções Header, Body e Footer
+│   │   ├── LandingPageForm.tsx       # Formulário, com uma aba por seção (Cabeçalho, Corpo, Rodapé)
 │   │   ├── LandingPageForm.test.tsx  # Testes do formulário
+│   │   ├── Tabs.tsx                  # Componente de abas acessível (mouse e teclado)
+│   │   ├── Tabs.test.tsx
 │   │   ├── Preview.tsx               # Mostra o HTML gerado dentro de um <iframe>
 │   │   └── fields.tsx                # Campos reutilizáveis (texto, cor, select, fundo…)
 │   └── test/setup.ts     # Roda antes dos testes: carrega os matchers do jest-dom e limpa o DOM

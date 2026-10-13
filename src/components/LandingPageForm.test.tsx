@@ -12,26 +12,42 @@ function renderForm(config: LandingPageConfig = defaultConfig) {
   return { onChange }
 }
 
-// Cada seção é um <fieldset> com <legend>, que o Testing Library enxerga como um "group".
-// `within` limita a busca à seção, já que "Título" existe tanto no Header quanto no Body.
-function getSection(name: 'Header' | 'Body' | 'Footer') {
-  return within(screen.getByRole('group', { name }))
+type SectionName = 'Cabeçalho' | 'Corpo' | 'Rodapé'
+
+// Cada seção é uma aba. Abrimos a aba e devolvemos o painel dela;
+// `within` limita a busca ao painel, já que "Título" existe tanto no Cabeçalho quanto no Corpo.
+function openTab(name: SectionName) {
+  fireEvent.click(screen.getByRole('tab', { name }))
+  return within(screen.getByRole('tabpanel', { name }))
 }
 
 describe('LandingPageForm', () => {
+  it('shows one section at a time, starting with the header', () => {
+    renderForm()
+
+    expect(screen.getByRole('tab', { name: 'Cabeçalho' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getAllByRole('tabpanel')).toHaveLength(1)
+    expect(screen.getByRole('tabpanel', { name: 'Cabeçalho' })).toBeVisible()
+
+    openTab('Rodapé')
+
+    expect(screen.getAllByRole('tabpanel')).toHaveLength(1)
+    expect(screen.getByRole('tabpanel', { name: 'Rodapé' })).toBeVisible()
+  })
+
   it('shows the current config values', () => {
     renderForm()
 
-    expect(getSection('Header').getByLabelText('Título')).toHaveValue(defaultConfig.header.title)
-    expect(getSection('Body').getByLabelText('Texto')).toHaveValue(defaultConfig.body.text)
-    expect(getSection('Footer').getByLabelText('Texto')).toHaveValue(defaultConfig.footer.text)
+    expect(openTab('Cabeçalho').getByLabelText('Título')).toHaveValue(defaultConfig.header.title)
+    expect(openTab('Corpo').getByLabelText('Texto')).toHaveValue(defaultConfig.body.text)
+    expect(openTab('Rodapé').getByLabelText('Texto')).toHaveValue(defaultConfig.footer.text)
   })
 
   it('updates the header title', async () => {
     const user = userEvent.setup()
     const { onChange } = renderForm()
 
-    await user.type(getSection('Header').getByLabelText('Título'), '!')
+    await user.type(openTab('Cabeçalho').getByLabelText('Título'), '!')
 
     expect(onChange).toHaveBeenCalledWith({
       ...defaultConfig,
@@ -42,7 +58,7 @@ describe('LandingPageForm', () => {
   it('updates the optional header logo URL', () => {
     const { onChange } = renderForm()
 
-    fireEvent.change(getSection('Header').getByLabelText('URL do logo (opcional)'), {
+    fireEvent.change(openTab('Cabeçalho').getByLabelText('URL do logo (opcional)'), {
       target: { value: 'https://example.com/logo.png' },
     })
 
@@ -55,7 +71,7 @@ describe('LandingPageForm', () => {
   it('updates a social URL while keeping the other social fields', () => {
     const { onChange } = renderForm()
 
-    fireEvent.change(getSection('Footer').getByLabelText('Instagram (URL opcional)'), {
+    fireEvent.change(openTab('Rodapé').getByLabelText('Instagram (URL opcional)'), {
       target: { value: 'https://instagram.com/minhaempresa' },
     })
 
@@ -72,7 +88,7 @@ describe('LandingPageForm', () => {
     const { onChange } = renderForm()
 
     // O user-event não sabe "digitar" num color picker, então disparamos o evento direto
-    fireEvent.change(getSection('Header').getByLabelText('Cor do texto'), {
+    fireEvent.change(openTab('Cabeçalho').getByLabelText('Cor do texto'), {
       target: { value: '#ff0000' },
     })
 
@@ -86,7 +102,7 @@ describe('LandingPageForm', () => {
     const user = userEvent.setup()
     const { onChange } = renderForm()
 
-    await user.selectOptions(getSection('Header').getByLabelText('Fonte'), 'Georgia')
+    await user.selectOptions(openTab('Cabeçalho').getByLabelText('Fonte'), 'Georgia')
 
     expect(onChange).toHaveBeenCalledWith({
       ...defaultConfig,
@@ -97,15 +113,15 @@ describe('LandingPageForm', () => {
   it('starts with no background images, since they are optional', () => {
     renderForm()
 
-    for (const section of ['Header', 'Body', 'Footer'] as const) {
-      expect(getSection(section).getByLabelText('URL da imagem de fundo (opcional)')).toHaveValue('')
+    for (const section of ['Cabeçalho', 'Corpo', 'Rodapé'] as const) {
+      expect(openTab(section).getByLabelText('URL da imagem de fundo (opcional)')).toHaveValue('')
     }
   })
 
   it('updates the body background color', () => {
     const { onChange } = renderForm()
 
-    fireEvent.change(getSection('Body').getByLabelText('Cor de fundo'), {
+    fireEvent.change(openTab('Corpo').getByLabelText('Cor de fundo'), {
       target: { value: '#00ff00' },
     })
 
@@ -118,7 +134,7 @@ describe('LandingPageForm', () => {
   it('adds a background image on top of the footer color', () => {
     const { onChange } = renderForm()
 
-    fireEvent.change(getSection('Footer').getByLabelText('URL da imagem de fundo (opcional)'), {
+    fireEvent.change(openTab('Rodapé').getByLabelText('URL da imagem de fundo (opcional)'), {
       target: { value: 'https://example.com/bg.jpg' },
     })
 
@@ -134,7 +150,7 @@ describe('LandingPageForm', () => {
   it('updates the header background color', () => {
     const { onChange } = renderForm()
 
-    fireEvent.change(getSection('Header').getByLabelText('Cor de fundo'), {
+    fireEvent.change(openTab('Cabeçalho').getByLabelText('Cor de fundo'), {
       target: { value: '#123456' },
     })
 
@@ -154,7 +170,7 @@ describe('LandingPageForm', () => {
       },
     })
 
-    await user.clear(getSection('Header').getByLabelText('URL da imagem de fundo (opcional)'))
+    await user.clear(openTab('Cabeçalho').getByLabelText('URL da imagem de fundo (opcional)'))
 
     expect(onChange).toHaveBeenCalledWith({
       ...defaultConfig,

@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import type { Background } from '../types'
 
 // Componentes de campo reutilizáveis. Todos são "controlados":
@@ -12,22 +11,6 @@ type FieldProps = {
   label: string
   value: string
   onChange: (value: string) => void
-}
-
-export function Section({ title, children }: { title: string; children: ReactNode }) {
-  const sectionNumber = title === 'Header' ? '01' : title === 'Body' ? '02' : '03'
-  const sectionIcon = title === 'Header' ? '✦' : title === 'Body' ? '▦' : '♡'
-
-  return (
-    <fieldset className="form-section space-y-4 rounded-lg border p-4">
-      <legend className="sr-only">{title}</legend>
-      <div className="section-heading" aria-hidden="true">
-        <span className="section-title"><span className="section-icon">{sectionIcon}</span>{title}</span>
-        <span className={`section-number section-number-${sectionNumber}`}>{sectionNumber}</span>
-      </div>
-      {children}
-    </fieldset>
-  )
 }
 
 export function TextField({

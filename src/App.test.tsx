@@ -11,9 +11,9 @@ describe('App', () => {
     render(<App />)
 
     expect(screen.getByRole('heading', { name: 'Landing Page Simulator' })).toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Header' })).toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Body' })).toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Footer' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Cabeçalho' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Corpo' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Rodapé' })).toBeInTheDocument()
   })
 
   it('describes what the app does', () => {
@@ -33,7 +33,7 @@ describe('App', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const header = within(screen.getByRole('group', { name: 'Header' }))
+    const header = within(screen.getByRole('tabpanel', { name: 'Cabeçalho' }))
     const title = header.getByLabelText('Título')
 
     await user.clear(title)
@@ -47,7 +47,8 @@ describe('App', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const body = within(screen.getByRole('group', { name: 'Body' }))
+    await user.click(screen.getByRole('tab', { name: 'Corpo' }))
+    const body = within(screen.getByRole('tabpanel', { name: 'Corpo' }))
     const title = body.getByLabelText('Título')
 
     await user.clear(title)
